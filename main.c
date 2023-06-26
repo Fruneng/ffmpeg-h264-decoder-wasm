@@ -47,6 +47,37 @@ static void save_jpeg(AVFrame *frame, const char *filename) {
     avcodec_free_context(&codec_ctx);
 }
 
+static int decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt)
+{
+	char buf[1024];
+	int ret;
+
+	ret = avcodec_send_packet(dec_ctx, pkt);
+	if (ret < 0) {
+    printf("send packet error \n");
+		return ret;
+	}
+	else {
+		while (ret >= 0) {
+			ret = avcodec_receive_frame(dec_ctx, frame);
+			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+        ret = 0;
+				break;
+			}
+			else if (ret < 0) {
+        printf("receive frame error \n");
+				break;
+			}
+
+      // save frame as jpeg file
+      char filename[256];
+      sprintf(filename, "frames/frame_%d.jpeg", dec_ctx->frame_number);
+      save_jpeg(frame, filename);
+		}
+	}
+	return ret;
+}
+
 
 int main(int argc, char **argv) {
     // ffmpeg 3.1 deprecated
@@ -59,6 +90,12 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Codec not found\n");
         exit(1);
     }
+
+    AVCodecParserContext *parser = av_parser_init(codec->id);
+		if (!parser) {
+        fprintf(stderr, "CodecParser not found\n");
+        exit(1);
+		}
 
     // 创建编解码器上下文
     AVCodecContext *codecContext = avcodec_alloc_context3(codec);
@@ -75,7 +112,7 @@ int main(int argc, char **argv) {
 
     // 创建帧和数据包
     AVFrame *frame = av_frame_alloc();
-    AVPacket packet;
+    AVPacket pkt;
 
     // 循环读取和解码数据包
     for (int i=0; i<=689; i++) {
@@ -88,31 +125,29 @@ int main(int argc, char **argv) {
         }
 
         // 读取NAL
-        uint8_t inbuf[1024*1024];
-        int bytesRead = fread(inbuf, 1, 1024*1024, file);
-        if (bytesRead <= 0) {
+        char* buf = malloc(1024*1024);
+        char* data = buf;
+        int data_size = fread(buf, 1, 1024*1024, file);
+        if (data_size <= 0) {
             break;
         }
 
-        // 设置数据包数据
-        packet.data = inbuf;
-        packet.size = bytesRead;
+        while (data_size > 0) {
+          int size = av_parser_parse2(parser, codecContext, &(pkt.data), &(pkt.size),
+            data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+          if (size < 0) {
+            fprintf(stderr, "Error while parsing\n");
+            exit(1);
+          }
+          data += size;
+          data_size -= size;
 
-        // 发送数据包到解码器
-        int ret = avcodec_send_packet(codecContext, &packet);
-        if (ret < 0) {
-            fprintf(stderr, "%s\n", av_err2str(ret));
-            // fprintf(stderr, "Error sending a packet for decoding\n");
-            // exit(1);make
-        }
-
-        // 获取解码后的帧
-        while (avcodec_receive_frame(codecContext, frame) == 0) {
-            printf("Frame %3d\n", codecContext->frame_number);
-            // 在这里，你可以访问 frame->data 来获取图像数据
-            char frame_name[256];
-            sprintf(frame_name, "frame_%04d.jpeg", codecContext->frame_number);
-            save_jpeg(frame, frame_name);
+          if (pkt.size) {
+            int ret = decode(codecContext, frame, &pkt);
+            if (ret < 0) {
+              fprintf(stderr, "Error while decode %s\n", av_err2str(ret));
+            }
+          }
         }
 
         fclose(file);
