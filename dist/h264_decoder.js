@@ -1,8 +1,8 @@
-function H264Decoder(module, channelName) {
+function H264Decoder(module, postFunc) {
   this.module = module;
 
   var _this = this;
-  var frameCallback = module.addFunction(function (addr_y, addr_u, addr_v, stride_y, stride_u, stride_v, width, height) {
+  var frameCallback = module.addFunction(function (addr_y, addr_u, addr_v, stride_y, stride_u, stride_v, width, height, pts) {
     console.log("[%d]In video callback, size = %d * %d, pts = %d", ++videoSize, width, height, pts)
     let out_y = HEAPU8.subarray(addr_y, addr_y + stride_y * height)
     let out_u = HEAPU8.subarray(addr_u, addr_u + (stride_u * height) / 2)
@@ -14,21 +14,16 @@ function H264Decoder(module, channelName) {
     data.set(buf_y, 0)
     data.set(buf_u, buf_y.length)
     data.set(buf_v, buf_y.length + buf_u.length)
-    var obj = {
-        data: data,
-        width,
-        height
-    }
     var objData = {
-        s: pts,
-        d: obj
+        type: 'pictureReady',
+        data: data,
+        width: width,
+        height, height,
     };
-    _this.postMessage(objData, [objData.d.data.buffer]);
+    postFunc(objData, [objData.d.data.buffer]);
   },'func');
 
   this._ctx = module._decoder_context_new(frameCallback);
-
-  addEventListener(channelName, onMessage);
 };
 
 H264Decoder.prototype.onMessage = function(e) {
@@ -55,8 +50,7 @@ H264Decoder.prototype.decode = function(data) {
   module._free(pInput);
 }
 
-H264bsdDecoder.prototype.close = function() {
+H264Decoder.prototype.close = function() {
   var module = this.module
   module._decoder_context_free(this._ctx)
 };
-

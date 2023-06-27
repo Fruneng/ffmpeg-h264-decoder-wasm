@@ -12,19 +12,49 @@
 以下是安装和使用该库的基本步骤：
 
 ```
-git clone https://github.com/Fruneng/decode-h264-demo
-cd decode-h264-demo
+git clone https://github.com/Fruneng/ffmpeg-h264-decoder-wasm.git
+cd ffmpeg-h264-decoder-wasm
 bash build.sh
 ```
 
 ```javascript
+// Create the decoder and canvas
+var decoder = new Worker('h264_worker.js');
 
-// TODO: balabala
+var display = new Canvas(canvas, {'fullRangeColor': true});
+
+console.log('Created decoder and canvas');
+
+decoder.addEventListener('error', function(e) {
+    console.log('Decoder error', e);
+})
+
+decoder.addEventListener('message', function(e) {
+    var message = e.data;
+    if (!message.hasOwnProperty('type')) return;
+
+    switch(message.type) {
+    case 'pictureReady':
+        display.drawNextOutputPicture(
+            message.width,
+            message.height,
+            message.croppingParams,
+            new Uint8Array(message.data));
+        ++pictureCount;
+        break;
+    case 'decoderReady':
+        console.log('Decoder ready');
+        break;
+    }
+});
+
 ```
 
-// 对解码后的帧进行进一步处理或展示
 ```javascript
-
+decoder.postMessage({
+    'type' : 'input', 
+    'data' : copy.buffer, 
+}, [copy.buffer]);
 ```
 
 ### 贡献和支持
@@ -39,7 +69,10 @@ bash build.sh
 感谢FFmpeg团队为我们提供强大的多媒体处理能力。此项目受益于FFmpeg C Lib的贡献和开源社区的支持。
 
 ### 参考项目
+
 [https://github.com/xiangxud/webrtc_H265player](https://github.com/xiangxud/webrtc_H265player)
+
 [https://github.com/ffmpegwasm/libav.wasm](https://github.com/ffmpegwasm/libav.wasm)
+
 [https://github.com/oneam/h264bsd](https://github.com/oneam/h264bsd)
 

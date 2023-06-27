@@ -4972,6 +4972,7 @@ var ASM_CONSTS = {
     }
 
 
+
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
       parent = this;  // root node sets parent to itself
@@ -5267,7 +5268,7 @@ var _ff_h264_cabac_tables = Module['_ff_h264_cabac_tables'] = 1051356;
 
 // === Auto-generated postamble setup entry stuff ===
 
-
+Module["addFunction"] = addFunction;
 var unexportedRuntimeSymbols = [
   'run',
   'UTF8ArrayToString',
@@ -5375,7 +5376,6 @@ var unexportedRuntimeSymbols = [
   'functionsInTableMap',
   'getEmptyTableSlot',
   'updateTableMap',
-  'addFunction',
   'removeFunction',
   'reallyNegative',
   'unSign',
