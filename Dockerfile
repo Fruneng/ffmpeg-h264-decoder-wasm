@@ -101,9 +101,10 @@ RUN emcc \
   -sALLOW_MEMORY_GROWTH \
   -sEXPORTED_FUNCTIONS=$(node src/export.js) \
   -sEXPORTED_RUNTIME_METHODS="['addFunction']" \
+  -sRESERVED_FUNCTION_POINTERS=18 \
   -o dist/decoder.js \
   src/*.c
 
-# Export libav.wasm to dist/, use `docker buildx build -o . .` to get assets
+# Export to dist/, use `docker buildx build -o . .` to get assets
 FROM scratch AS exportor
 COPY --from=h264decoder-wasm-builder /src/dist /dist

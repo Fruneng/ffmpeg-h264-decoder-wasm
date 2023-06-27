@@ -3,10 +3,10 @@ function H264Decoder(module, postFunc) {
 
   var _this = this;
   var frameCallback = module.addFunction(function (addr_y, addr_u, addr_v, stride_y, stride_u, stride_v, width, height, pts) {
-    console.log("[%d]In video callback, size = %d * %d, pts = %d", ++videoSize, width, height, pts)
-    let out_y = HEAPU8.subarray(addr_y, addr_y + stride_y * height)
-    let out_u = HEAPU8.subarray(addr_u, addr_u + (stride_u * height) / 2)
-    let out_v = HEAPU8.subarray(addr_v, addr_v + (stride_v * height) / 2)
+    console.log("In video callback, size = %d * %d, pts = %d", width, height, pts)
+    let out_y = module.HEAPU8.subarray(addr_y, addr_y + stride_y * height)
+    let out_u = module.HEAPU8.subarray(addr_u, addr_u + (stride_u * height) / 2)
+    let out_v = module.HEAPU8.subarray(addr_v, addr_v + (stride_v * height) / 2)
     let buf_y = new Uint8Array(out_y)
     let buf_u = new Uint8Array(out_u)
     let buf_v = new Uint8Array(out_v)
@@ -19,9 +19,10 @@ function H264Decoder(module, postFunc) {
         data: data,
         width: width,
         height, height,
+        croppingParams: null,
     };
-    postFunc(objData, [objData.d.data.buffer]);
-  },'func');
+    postFunc(objData, [objData.data.buffer]);
+  },'viiiiiiiii');
 
   this._ctx = module._decoder_context_new(frameCallback);
 };
