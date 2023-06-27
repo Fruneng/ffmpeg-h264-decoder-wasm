@@ -4,10 +4,18 @@
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 int ErrorCode_FFmpeg_Parsing = -1;
 int ErrorCode_FFmpeg_Send_Packet = -2;
 int ErrorCode_FFmpeg_Receive_Frame = -3;
 
+/*
+ * frame_callback
+ * if the frame generate the function will be call. pass by `decoder_context_new`.
+ */
 typedef void(*frame_callback)(unsigned char* data_y, unsigned char* data_u, unsigned char* data_v, int line1, int line2, int line3, int width, int height, long pts);
 
 typedef struct {
@@ -19,6 +27,13 @@ typedef struct {
   frame_callback callback;
 }decoder_context;
 
+/*
+ * decoder_context_new 
+ * allocate the decoder context.
+ */
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+#endif
 decoder_context* decoder_context_new(long callback) {
   AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
   if (!codec) {
@@ -83,6 +98,13 @@ FAIL:
   return NULL;
 }
 
+/*
+ * decoder_context_free 
+ * deallocate the decoder context.
+ */
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+#endif
 void decoder_context_free(decoder_context* ctx) {
   if (!ctx) {
     return;
@@ -110,7 +132,6 @@ static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame
 
   ret = avcodec_send_packet(dec_ctx, pkt);
   if (ret < 0) {
-    printf("send packet error \n");
     return ErrorCode_FFmpeg_Send_Packet;
   }
   else {
@@ -120,7 +141,6 @@ static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame
         ret = 0;
         break;
       } else if (ret < 0) {
-        printf("receive frame error \n");
         ret = ErrorCode_FFmpeg_Receive_Frame;
         break;
       }
@@ -132,6 +152,13 @@ static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame
   return ret;
 }
 
+/*
+ * decode 
+ * decode h264 annex b stream b by a sequence of bytes. 
+ */
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+#endif
 int decode(decoder_context* ctx, unsigned char* data, size_t data_size) {
   int ret = 0;
   while (data_size > 0) {

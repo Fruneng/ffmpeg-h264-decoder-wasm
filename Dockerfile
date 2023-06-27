@@ -99,10 +99,10 @@ RUN emcc \
   -sMODULARIZE \
   -sALLOW_MEMORY_GROWTH \
   -sEXPORTED_FUNCTIONS=$(node src/export.js) \
-  -sEXPORTED_RUNTIME_METHODS=$(node src/export-runtime.js) \
-  --pre-js src/bind.js \
   -o dist/decoder.js \
   src/*.c
+
+RUN pwd && cp src/h264_*.js /src/dist
 
 # Export libav.wasm to dist/, use `docker buildx build -o . .` to get assets
 FROM scratch AS exportor
