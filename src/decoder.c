@@ -44,30 +44,30 @@ decoder_context* decoder_context_new(long callback) {
   AVCodecParserContext *parser = av_parser_init(codec->id);
   if (!parser) {
     fprintf(stderr, "CodecParser not found\n");
-    return NULL;
+    goto FAIL;
   }
 
   AVCodecContext *codec_ctx = avcodec_alloc_context3(codec);
   if (!codec_ctx) {
     fprintf(stderr, "Could not allocate video codec context\n");
-    return NULL;
+    goto FAIL;
   }
 
   if (avcodec_open2(codec_ctx, codec, NULL) < 0) {
     fprintf(stderr, "Could not open codec\n");
-    return NULL;
+    goto FAIL;
   }
 
   AVFrame *frame = av_frame_alloc();
   if (!frame) {
     fprintf(stderr, "Could not allocate frame context\n");
-    return NULL;
+    goto FAIL;
   }
 
   AVPacket *pkt = av_packet_alloc();
   if (!pkt) {
     fprintf(stderr, "Could not allocate packet context\n");
-    return NULL;
+    goto FAIL;
   }
 
   decoder_context *ctx = malloc(sizeof(decoder_context));
