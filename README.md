@@ -57,6 +57,17 @@ decoder.postMessage({
 }, [copy.buffer]);
 ```
 
+### example
+
+1. 运行脚本
+```
+bash run_example.sh
+```
+
+2. 浏览器打开 http://localhost:8080/test.html 
+
+3. 选择项目下dump文件 即可播放
+
 ### 贡献和支持
 欢迎对该项目进行贡献！如果你发现了问题或有改进建议，请在GitHub上提交issue或提出pull请求。
 

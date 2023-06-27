@@ -57,6 +57,17 @@ decoder.postMessage({
 }, [copy.buffer]);
 ```
 
+### example
+
+1. run script
+```
+bash run_example.sh
+```
+
+2. Open in your browser http://localhost:8080/test.html.
+
+3. Choose the dump file in this project.
+
 ### Contribution and Support
 Contributions to this project are welcome! If you encounter any issues or have suggestions for improvement, please submit an issue or pull request on GitHub.
 

@@ -211,6 +211,9 @@ Canvas.prototype.initTexture = function() {
 Canvas.prototype.drawNextOutputPicture = function(width, height, croppingParams, data) {
   var gl = this.contextGL;
 
+  canvas.width = width;
+  canvas.height = height; 
+
   if(gl) {
     this.drawNextOuptutPictureGL(width, height, croppingParams, data);
   } else {
@@ -226,7 +229,7 @@ Canvas.prototype.drawNextOuptutPictureGL = function(width, height, croppingParam
   var texturePosBuffer = this.texturePosBuffer;
   var yTextureRef = this.yTextureRef;
   var uTextureRef = this.uTextureRef;
-  var vTextureRef = this.vTextureRef;    
+  var vTextureRef = this.vTextureRef;
 
   if(croppingParams === null) {
     gl.viewport(0, 0, width, height);
