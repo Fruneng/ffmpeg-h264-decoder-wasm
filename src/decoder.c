@@ -105,53 +105,53 @@ void decoder_context_free(decoder_context* ctx) {
 }
 
 static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame_callback callback) {
-	char buf[1024];
-	int ret;
+  char buf[1024];
+  int ret;
 
-	ret = avcodec_send_packet(dec_ctx, pkt);
-	if (ret < 0) {
+  ret = avcodec_send_packet(dec_ctx, pkt);
+  if (ret < 0) {
     printf("send packet error \n");
-		return ErrorCode_FFmpeg_Send_Packet;
-	}
-	else {
-		while (ret >= 0) {
-			ret = avcodec_receive_frame(dec_ctx, frame);
-			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+    return ErrorCode_FFmpeg_Send_Packet;
+  }
+  else {
+    while (ret >= 0) {
+      ret = avcodec_receive_frame(dec_ctx, frame);
+      if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
         ret = 0;
-				break;
-			}
-			else if (ret < 0) {
+        break;
+      }
+    else if (ret < 0) {
         printf("receive frame error \n");
         ret = ErrorCode_FFmpeg_Receive_Frame;
-				break;
-			}
+        break;
+      }
 
       callback(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2], frame->width, frame->height, frame->pts);
 
-		}
-	}
-	return ret;
+    }
+  }
+  return ret;
 }
 
 int decode(decoder_context* ctx, unsigned char* data, size_t data_size) {
   int ret = 0;
-	while (data_size > 0) {
-		int size = av_parser_parse2(ctx->parser, ctx->codec_ctx, &(ctx->pkt->data), &(ctx->pkt->size),
-			data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-		if (size < 0) {
-			ret = ErrorCode_FFmpeg_Parsing;
-		}
-		data += size;
-		data_size -= size;
+  while (data_size > 0) {
+    int size = av_parser_parse2(ctx->parser, ctx->codec_ctx, &(ctx->pkt->data), &(ctx->pkt->size),
+      data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+    if (size < 0) {
+      ret = ErrorCode_FFmpeg_Parsing;
+    }
+    data += size;
+    data_size -= size;
 
-		if (ctx->pkt->size) {
-			ret = _decode(ctx->codec_ctx, ctx->frame, ctx->pkt, ctx->callback);
-			if (ret < 0) {
+    if (ctx->pkt->size) {
+      ret = _decode(ctx->codec_ctx, ctx->frame, ctx->pkt, ctx->callback);
+      if (ret < 0) {
         break; 
       }
-		}
-	}
-	return ret;
+    }
+  }
+  return ret;
 }
 
 void demo_callback(unsigned char* data_y, unsigned char* data_u, unsigned char* data_v, int line1, int line2, int line3, int width, int height, long pts) {
