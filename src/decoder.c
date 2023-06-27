@@ -104,8 +104,7 @@ void decoder_context_free(decoder_context* ctx) {
   free(ctx);
 }
 
-static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame_callback callback)
-{
+static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame_callback callback) {
 	char buf[1024];
 	int ret;
 
@@ -159,14 +158,13 @@ void demo_callback(unsigned char* data_y, unsigned char* data_u, unsigned char* 
   printf("got a frame, width: %d, height: %d\n", width, height);
 }
 
-
 // nal test
 // int main(int argc, char **argv) {
 //   decoder_context *ctx = decoder_context_new((long int)demo_callback);
   
 //   for (int i=0; i<=689; i++) {
 //     char filename[255];
-//     sprintf(filename, "./data/dump.%04d", i);
+//     sprintf(filename, "../data/dump.%04d", i);
 //     FILE *file = fopen(filename, "rb");
 //     if (!file) {
 //         fprintf(stderr, "Could not open file\n");
@@ -196,7 +194,7 @@ void demo_callback(unsigned char* data_y, unsigned char* data_u, unsigned char* 
 int main(int argc, char **argv) {
   decoder_context *ctx = decoder_context_new((long int)demo_callback);
   
-  FILE *file = fopen("dump", "rb");
+  FILE *file = fopen("../dump", "rb");
   if (!file) {
     fprintf(stderr, "Could not open file\n");
     exit(1);
