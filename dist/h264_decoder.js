@@ -3,7 +3,6 @@ function H264Decoder(module, postFunc) {
 
   var _this = this;
   var frameCallback = module.addFunction(function (addr_y, addr_u, addr_v, stride_y, stride_u, stride_v, width, height, pts) {
-    console.log("In video callback, size = %d * %d, pts = %d", width, height, pts)
     let out_y = module.HEAPU8.subarray(addr_y, addr_y + stride_y * height)
     let out_u = module.HEAPU8.subarray(addr_u, addr_u + (stride_u * height) / 2)
     let out_v = module.HEAPU8.subarray(addr_v, addr_v + (stride_v * height) / 2)
@@ -26,16 +25,6 @@ function H264Decoder(module, postFunc) {
 
   this._ctx = module._decoder_context_new(frameCallback);
 };
-
-H264Decoder.prototype.onMessage = function(e) {
-  var message = e.data;
-  switch(message.type) {
-  case 'input' :
-    this.decode(message.data)
-    break;
-  }
-}
-
 
 H264Decoder.prototype.decode = function(data) {
   var module = this.module
