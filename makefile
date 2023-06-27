@@ -1,8 +1,8 @@
 
 all: a
 
-a: main.c
-	gcc -o a  main.c  -lavcodec -lavutil -lavformat -lswscale -g
+a: decoder.c
+	gcc -o a  decoder.c  -lavcodec -lavutil -lavformat -lswscale -g
 
 
 clean:
