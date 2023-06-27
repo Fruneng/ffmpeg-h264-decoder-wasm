@@ -89,7 +89,7 @@ Canvas.prototype.initProgram = function(params) {
   ].join(' ');
   
   var yCbCrMat = bt709StudioRange
-  if (params.hasOwnProperty('fullRangeColor') && params['fullRangeColor']) {
+  if (Object.prototype.hasOwnProperty.call(params, 'fullRangeColor') && params['fullRangeColor']) {
     console.log('Using full range color conversion')
     yCbCrMat = bt709FullRange
   }
@@ -210,6 +210,7 @@ Canvas.prototype.initTexture = function() {
 */
 Canvas.prototype.drawNextOutputPicture = function(width, height, croppingParams, data) {
   var gl = this.contextGL;
+  var canvas = this.canvasElement;
 
   canvas.width = width;
   canvas.height = height; 
@@ -274,8 +275,6 @@ Canvas.prototype.drawNextOuptutPictureGL = function(width, height, croppingParam
 */
 Canvas.prototype.drawNextOuptutPictureRGBA = function(width, height, croppingParams, data) {
   var canvas = this.canvasElement;
-
-  var croppingParams = null;
 
   var argbData = data;
 
