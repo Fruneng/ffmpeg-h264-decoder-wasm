@@ -119,15 +119,14 @@ static int _decode(AVCodecContext* dec_ctx, AVFrame* frame, AVPacket* pkt, frame
       if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
         ret = 0;
         break;
-      }
-    else if (ret < 0) {
+      } else if (ret < 0) {
         printf("receive frame error \n");
         ret = ErrorCode_FFmpeg_Receive_Frame;
         break;
       }
-
-      callback(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2], frame->width, frame->height, frame->pts);
-
+      if (callback) {
+        callback(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2], frame->width, frame->height, frame->pts);
+      }
     }
   }
   return ret;
