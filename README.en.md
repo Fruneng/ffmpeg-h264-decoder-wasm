@@ -14,7 +14,7 @@ Below are the basic steps to install and use the library:
 ```
 git clone https://github.com/Fruneng/ffmpeg-h264-decoder-wasm.git
 cd ffmpeg-h264-decoder-wasm
-bash build.sh
+make
 ```
 
 ```javascript

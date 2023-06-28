@@ -14,7 +14,7 @@
 ```
 git clone https://github.com/Fruneng/ffmpeg-h264-decoder-wasm.git
 cd ffmpeg-h264-decoder-wasm
-bash build.sh
+make
 ```
 
 ```javascript
